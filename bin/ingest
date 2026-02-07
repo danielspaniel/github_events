@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+# One-off ingestion script for docker compose run --rm ingest
+# Wires logging to STDOUT so output is visible in the container.
+
+require_relative "../config/environment"
+
+STDOUT.sync = true
+Rails.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+Rails.logger.level = Logger::INFO
+
+Rails.logger.info("Ingest starting")
+PollGithubEventsJob.perform_now(schedule_next: false)
+Rails.logger.info("Ingest finished")

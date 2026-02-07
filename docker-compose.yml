@@ -1,0 +1,74 @@
+x-dev-environment: &dev-environment
+  RAILS_ENV: development
+  DB_HOST: db
+  DB_PORT: 5432
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+  REDIS_URL: redis://redis:6379/0
+
+x-dev-service: &dev-service
+  build:
+    context: .
+    target: dev
+  depends_on:
+    - db
+    - redis
+  volumes:
+    - .:/rails
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: github_events_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  app:
+    <<: *dev-service
+    environment:
+      <<: *dev-environment
+    ports:
+      - "3000:3000"
+    command: bin/rails server -b 0.0.0.0
+
+  polling:
+    <<: *dev-service
+    environment:
+      <<: *dev-environment
+    command: bin/jobs
+
+  ingest:
+    <<: *dev-service
+    profiles:
+      - tools
+    environment:
+      <<: *dev-environment
+    command: bin/ingest
+
+  test:
+    <<: *dev-service
+    profiles:
+      - tools
+    environment:
+      RAILS_ENV: test
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      REDIS_URL: redis://redis:6379/0
+    command: bin/rails test
+
+volumes:
+  postgres_data:

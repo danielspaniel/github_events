@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+require "sidekiq/api"
+
+$stdout.sync = true
+Rails.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+
+# Clear polling queue and scheduled polling jobs on boot
+Sidekiq::Queue.new("polling").clear
+Sidekiq::ScheduledSet.new.each { |job| job.delete if job.queue == "polling" }
+
+# Enqueue exactly one
+PollGithubEventsJob.perform_later
+Rails.logger.info("Enqueued initial PollGithubEventsJob")
+
+# Single concurrency — one job at a time, no duplicates
+exec "bundle exec sidekiq -c 1 -q polling -q default -r /rails/config/environment.rb"
