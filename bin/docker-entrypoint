@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Prepare database (create + migrate) without Solid Queue so the
+# migration that creates its tables can actually run.
+ACTIVE_JOB_QUEUE_ADAPTER=async ./bin/rails db:prepare
+
+echo "== db:prepare complete, starting: $@ =="
+exec "${@}"
