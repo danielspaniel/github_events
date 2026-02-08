@@ -90,7 +90,7 @@ GEM
       bundler (>= 1.2.0)
       thor (~> 1.0)
     concurrent-ruby (1.3.6)
-    connection_pool (2.5.5)
+    connection_pool (3.0.2)
     crack (1.0.1)
       bigdecimal
       rexml
@@ -357,7 +357,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   bundler-audit
-  connection_pool (~> 2.4)
+  connection_pool (~> 3.0)
   debug
   factory_bot_rails
   faraday (>= 2.0)

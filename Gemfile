@@ -33,7 +33,7 @@ gem "faraday", ">= 2.0"
 # Background jobs + Redis
 gem "redis", ">= 5.0"
 gem "sidekiq", ">= 7.0"
-gem "connection_pool", "~> 2.4"
+gem "connection_pool", "~> 3.0"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
